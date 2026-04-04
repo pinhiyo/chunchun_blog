@@ -24,11 +24,21 @@ HTML_FILE = "index.html"
 # 2. GitHub Actions: リポジトリの Secrets に GEMINI_API_KEY を登録してください
 API_KEY = os.environ.get("GEMINI_API_KEY")
 
+print("🔍 診断モード：環境変数のチェックを開始します...")
 if API_KEY:
-    genai.configure(api_key=API_KEY)
+    # セキュリティのため最初の2文字と長さだけ表示
+    key_prefix = API_KEY[:2] if len(API_KEY) > 2 else "??"
+    print(f"✅ GEMINI_API_KEY を検出しました（先頭: {key_prefix}... / 長さ: {len(API_KEY)}文字）")
+    
+    try:
+        genai.configure(api_key=API_KEY)
+        print("✅ Gemini APIの設定に成功しました。")
+    except Exception as e:
+        print(f"❌ エラー: Gemini APIの設定中に問題が発生しました: {e}")
+        sys.exit(1)
 else:
-    print("❌ エラー: Gemini APIキーが見つかりません。環境変数 GEMINI_API_KEY を設定してください。")
-    # GitHubのSecrets登録方法などは、ひよちゃんに聞いてね！
+    print("❌ エラー: Gemini APIキーが見つかりません。")
+    print("   GitHubの「Secrets」またはローカルの環境変数に GEMINI_API_KEY を設定してください。")
     sys.exit(1)
 
 # ブログの設定とプロンプト
@@ -438,8 +448,23 @@ def generate_post(past_posts):
         warnings.simplefilter("ignore")
         print("📝 ブログ記事を生成中...")
         
-        model = genai.GenerativeModel('gemini-1.5-flash')
-        response = model.generate_content(prompt)
+        # モデルの指定（エラーが出る場合はエイリアスを試す）
+        # より安定して利用可能なモデル（Gemini Flash Latest）を指定
+        model_name = 'gemini-flash-latest'
+        model = genai.GenerativeModel(model_name)
+        
+        try:
+            response = model.generate_content(prompt)
+        except Exception as e:
+            if "not found" in str(e).lower():
+                print(f"⚠️ モデル {model_name} が見つかりませんでした。利用可能なモデルを確認します...")
+                try:
+                    for m in genai.list_models():
+                        if 'generateContent' in m.supported_generation_methods:
+                            print(f"  - {m.name}")
+                except:
+                    pass
+            raise e
         
         try:
             # JSON部分を抽出

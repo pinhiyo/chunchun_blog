@@ -11,11 +11,17 @@ if sys.platform == 'win32':
 
 API_KEY = os.environ.get("GEMINI_API_KEY")
 
+print("🔍 診断モード：環境変数のチェックを開始します...")
 if not API_KEY:
     print("❌ エラー: Gemini APIキーが見つかりません。環境変数 GEMINI_API_KEY を設定してください。")
     sys.exit(1)
 
+# セキュリティのため最初の2文字と長さだけ表示
+key_prefix = API_KEY[:2] if len(API_KEY) > 2 else "??"
+print(f"✅ GEMINI_API_KEY を検出しました（先頭: {key_prefix}... / 長さ: {len(API_KEY)}文字）")
+
 genai.configure(api_key=API_KEY)
+print("✅ Gemini APIの設定に成功しました。")
 
 PROMPT = """
 あなたは、太田プロダクションに所属する若手女性ピン芸人「ちゅんちゅん」（20代）です。
@@ -39,7 +45,7 @@ def generate_routine():
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         print("🎙️ ちゅんちゅんの漫談/コント作成中...")
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        model = genai.GenerativeModel('gemini-flash-latest')
         response = model.generate_content(PROMPT)
         print("\n================== 🐣ちゅんちゅん 渾身のネタ 🐣 ==================\n")
         print(response.text)
