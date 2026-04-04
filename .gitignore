@@ -1,0 +1,15 @@
+# Pythonが勝手に作るゴミファイルを無視
+__pycache__/
+*.py[cod]
+*$py.class
+
+# 仮想環境を無視
+venv/
+.venv/
+
+# エディタの設定などを無視
+.vscode/
+.idea/
+
+# ログファイルを無視
+*.log
