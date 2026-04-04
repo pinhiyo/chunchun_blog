@@ -438,7 +438,7 @@ def generate_post(past_posts):
         warnings.simplefilter("ignore")
         print("📝 ブログ記事を生成中...")
         
-        model = genai.GenerativeModel('gemini-2.5-flash')
+        model = genai.GenerativeModel('gemini-1.5-flash')
         response = model.generate_content(prompt)
         
         try:
@@ -528,7 +528,8 @@ def main():
     # 1. ブログ記事と画像プロンプトを生成 (過去の投稿をコンテキストとして渡す)
     new_post_data = generate_post(posts)
     if not new_post_data:
-        return
+        print("❌ エラー: 記事の生成に失敗しました。")
+        sys.exit(1)
 
     # 2. 画像を作成・保存
     timestamp = int(datetime.now().timestamp())

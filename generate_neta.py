@@ -39,7 +39,7 @@ def generate_routine():
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         print("🎙️ ちゅんちゅんの漫談/コント作成中...")
-        model = genai.GenerativeModel('gemini-2.5-flash')
+        model = genai.GenerativeModel('gemini-1.5-flash')
         response = model.generate_content(PROMPT)
         print("\n================== 🐣ちゅんちゅん 渾身のネタ 🐣 ==================\n")
         print(response.text)
